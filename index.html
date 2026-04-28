@@ -44,23 +44,6 @@
         </div>
     </div>
 
-    <!-- Password Gate -->
-    <div id="password-gate" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.92); align-items:center; justify-content:center; flex-direction:column;">
-        <div style="background:#1e2a3a; border:2px solid #d4af37; border-radius:16px; padding:40px 36px; text-align:center; max-width:360px; width:90%;">
-            <img src="LOGO-01.jpg" alt="" style="width:80px; height:80px; object-fit:contain; border-radius:50%; margin-bottom:14px;">
-            <h2 style="color:#d4af37; margin-bottom:6px; font-family:'Cairo',sans-serif; font-size:1.3rem;">مسابقة الثقافة الرياضية</h2>
-            <p style="color:#aaa; margin-bottom:20px; font-size:0.9rem; font-family:'Cairo',sans-serif;">أدخل كلمة المرور للمتابعة</p>
-            <input type="password" id="gate-password"
-                   placeholder="أدخل كلمة المرور"
-                   style="width:100%; padding:12px 16px; border-radius:10px; border:1px solid #444; background:#0d1621; color:#fff; font-size:1rem; font-family:'Cairo',sans-serif; text-align:center; box-sizing:border-box; margin-bottom:14px;"
-                   onkeydown="if(event.key==='Enter') checkGatePassword()">
-            <button onclick="checkGatePassword()"
-                    style="width:100%; padding:12px; border-radius:10px; background:#d4af37; color:#000; font-weight:700; font-size:1rem; border:none; cursor:pointer; font-family:'Cairo',sans-serif;">
-                دخول
-            </button>
-        </div>
-    </div>
-
     <!-- Background -->
     <div class="bg-overlay"></div>
     <div id="particles-container"></div>
@@ -161,19 +144,9 @@
         </div>
     </div>
 
-    <!-- Golden Question Modal (no answers, manual judge) -->
+    <!-- Golden Question Modal (no answers, no timer, manual judge) -->
     <div class="modal-overlay" id="golden-question-modal">
         <div class="modal-content golden-modal-content">
-            <div class="timer-container">
-                <div class="timer-ring">
-                    <svg viewBox="0 0 120 120">
-                        <circle class="timer-bg" cx="60" cy="60" r="54"></circle>
-                        <circle class="timer-progress" id="golden-timer-progress" cx="60" cy="60" r="54"></circle>
-                    </svg>
-                    <div class="timer-text" id="golden-timer-text">30</div>
-                </div>
-                <div class="timer-label">ثانية متبقية</div>
-            </div>
             <div class="golden-badge"><i class="fas fa-star"></i> سؤال ذهبي</div>
             <h2 class="question-text" id="golden-question-text">نص السؤال هنا</h2>
             <div class="golden-judge-buttons" id="golden-judge-buttons">
@@ -218,7 +191,7 @@
             <div class="wheel-wrapper">
                 <canvas id="wheel-canvas" width="260" height="260"></canvas>
             </div>
-            <div class="wheel-result" id="wheel-result" style="display:none;"></div>
+            <div class="wheel-result" id="spin-result" style="display:none;"></div>
             <button class="btn btn-primary" id="spin-btn" onclick="spinWheel()" style="width:100%; margin-bottom:10px;">
                 <i class="fas fa-play"></i> دوّر العجلة
             </button>

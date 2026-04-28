@@ -312,6 +312,12 @@ function initApp() {
     updateTurnIndicator();
     createParticles();
     document.addEventListener('click', () => sounds.init(), { once: true });
+
+    // Auto-show spin wheel at start to determine who goes first
+    const hasProgress = !!localStorage.getItem(KEY('quiz_progress'));
+    if (!hasProgress) {
+        setTimeout(() => showSpinWheelModal(), 600);
+    }
 }
 
 // ====== Password Gate ======
@@ -391,13 +397,17 @@ function loadGameData() {
         gameState.answeredCount = progress.answeredCount || 0;
     }
 
-    // Load golden questions (max 4)
+    // Load golden questions — always keep 4 slots
     const savedGolden = localStorage.getItem(KEY('quiz_golden'));
     if (savedGolden) {
         const parsed = JSON.parse(savedGolden);
         goldenQuestions = Array.isArray(parsed) ? parsed.slice(0, 4) : [];
     } else {
         goldenQuestions = [];
+    }
+    // Fill remaining slots with default placeholders so 4 boxes always show
+    for (let i = goldenQuestions.length + 1; i <= 4; i++) {
+        goldenQuestions.push({ id: `g${i}`, question: `سؤال ذهبي ${i}` });
     }
 }
 
@@ -438,11 +448,7 @@ function renderGoldenGrid() {
     const grid = document.getElementById('golden-grid');
     if (!grid) return;
 
-    if (!goldenQuestions || goldenQuestions.length === 0) {
-        if (section) section.style.display = 'none';
-        return;
-    }
-
+    // Always show the golden section (4 boxes guaranteed)
     if (section) section.style.display = '';
     grid.innerHTML = '';
 
@@ -450,7 +456,8 @@ function renderGoldenGrid() {
         const cell = document.createElement('div');
         cell.className = 'number-cell golden-cell';
         cell.setAttribute('data-golden-id', q.id);
-        cell.textContent = q.id.replace('g', '★');
+        const num = q.id.replace('g', '');
+        cell.innerHTML = `<i class="fas fa-star"></i><span>${num}</span>`;
         cell.addEventListener('click', () => selectGoldenQuestion(q.id));
         grid.appendChild(cell);
     });
@@ -493,24 +500,24 @@ function showGoldenQuestion() {
     const modal = document.getElementById('golden-question-modal');
     if (!modal) return;
 
-    const textEl = modal.querySelector('#golden-question-text') || modal.querySelector('.question-text');
+    const textEl = document.getElementById('golden-question-text');
     if (textEl) textEl.textContent = q.question;
 
-    const badgeEl = modal.querySelector('#golden-question-badge') || modal.querySelector('.question-badge');
-    if (badgeEl) badgeEl.textContent = `سؤال ذهبي ${q.id.replace('g', '')}`;
-
-    const resultEl = modal.querySelector('#golden-result') || modal.querySelector('.question-result');
+    const resultEl = document.getElementById('golden-result');
     if (resultEl) { resultEl.className = 'question-result'; resultEl.style.display = 'none'; }
 
+    const judgeEl = document.getElementById('golden-judge-buttons');
+    if (judgeEl) judgeEl.style.display = '';
+
     modal.classList.add('active');
-    startGoldenTimer();
+    // No timer for golden questions
 }
 
 function judgeGolden(isCorrect) {
-    stopGoldenTimer();
-
     const modal = document.getElementById('golden-question-modal');
-    const resultEl = modal ? (modal.querySelector('#golden-result') || modal.querySelector('.question-result')) : null;
+    const resultEl = document.getElementById('golden-result');
+    const judgeEl = document.getElementById('golden-judge-buttons');
+    if (judgeEl) judgeEl.style.display = 'none';
 
     if (isCorrect) {
         sounds.playCorrect();
