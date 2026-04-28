@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم - مسابقة الثقافة الرياضية</title>
+    <link rel="icon" type="image/jpeg" href="LOGO-01.jpg">
+    <link rel="apple-touch-icon" href="LOGO-01.jpg">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <div class="bg-overlay"></div>
+    <div class="watermark-bg">
+        <img src="LOGO-01.jpg" alt="" class="watermark-logo">
+    </div>
+
+    <div class="admin-container" id="admin-content">
+        <!-- Back Link -->
+        <a href="index.html" class="back-link">
+            <i class="fas fa-arrow-right"></i>
+            العودة للمسابقة
+        </a>
+
+        <!-- شعارات لوحة التحكم (نفس المقاس) -->
+        <div class="admin-panel-logos">
+            <div class="admin-panel-logo-wrap">
+                <img src="moe-logo.jpeg" alt="وزارة التعليم" class="admin-panel-logo">
+            </div>
+            <div class="admin-panel-logos-title">
+                <span>مسابقة الثقافة الرياضية المدرسية</span>
+                <span class="admin-panel-logos-sub">لوحة التحكم</span>
+            </div>
+            <div class="admin-panel-logo-wrap">
+                <img src="LOGO-01.jpg" alt="الاتحاد السعودي للثقافة الرياضية" class="admin-panel-logo">
+            </div>
+        </div>
+
+        <!-- Header -->
+        <div class="admin-header">
+            <h1><i class="fas fa-cogs" style="color: var(--primary);"></i> إدارة الفرق والأسئلة</h1>
+            <p>إعدادات المسابقة والمؤقت والأسئلة</p>
+        </div>
+
+        <!-- Alert -->
+        <div class="alert alert-success" id="alert-success">
+            <i class="fas fa-check-circle"></i> <span id="alert-success-text">تم الحفظ بنجاح!</span>
+        </div>
+        <div class="alert alert-error" id="alert-error">
+            <i class="fas fa-exclamation-circle"></i> <span id="alert-error-text">حدث خطأ!</span>
+        </div>
+
+        <!-- Teams Card -->
+        <div class="admin-card">
+            <h2><i class="fas fa-users"></i> إعدادات الفرق</h2>
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-flag" style="color: var(--team1-color);"></i> اسم الفريق الأول</label>
+                    <input type="text" id="team1-name-input" placeholder="أدخل اسم الفريق الأول">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-flag" style="color: var(--team2-color);"></i> اسم الفريق الثاني</label>
+                    <input type="text" id="team2-name-input" placeholder="أدخل اسم الفريق الثاني">
+                </div>
+            </div>
+            
+            <!-- Team Logos -->
+            <div class="form-row" style="margin-top: 15px;">
+                <div class="form-group">
+                    <label><i class="fas fa-image" style="color: var(--team1-color);"></i> شعار الفريق الأول</label>
+                    <div class="logo-upload-area" id="logo-upload-area1">
+                        <div class="logo-preview-container">
+                            <img src="" alt="" class="logo-preview-img" id="logo-preview1" style="display:none;">
+                            <div class="logo-preview-placeholder" id="logo-placeholder1">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span>اختر صورة أو اسحبها هنا</span>
+                            </div>
+                        </div>
+                        <input type="file" id="logo-file1" accept="image/*" onchange="handleLogoUpload(1, event)" style="display:none;">
+                        <div class="logo-upload-actions">
+                            <button type="button" class="btn btn-primary btn-sm" onclick="document.getElementById('logo-file1').click()">
+                                <i class="fas fa-upload"></i> رفع صورة
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm" onclick="removeLogo(1)" id="remove-logo1" style="display:none;">
+                                <i class="fas fa-trash"></i> حذف
+                            </button>
+                        </div>
+                        <div class="form-group" style="margin-top:8px; margin-bottom:0;">
+                            <input type="text" id="logo-url1" placeholder="أو الصق رابط الشعار هنا..." oninput="handleLogoUrl(1)">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-image" style="color: var(--team2-color);"></i> شعار الفريق الثاني</label>
+                    <div class="logo-upload-area" id="logo-upload-area2">
+                        <div class="logo-preview-container">
+                            <img src="" alt="" class="logo-preview-img" id="logo-preview2" style="display:none;">
+                            <div class="logo-preview-placeholder" id="logo-placeholder2">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span>اختر صورة أو اسحبها هنا</span>
+                            </div>
+                        </div>
+                        <input type="file" id="logo-file2" accept="image/*" onchange="handleLogoUpload(2, event)" style="display:none;">
+                        <div class="logo-upload-actions">
+                            <button type="button" class="btn btn-primary btn-sm" onclick="document.getElementById('logo-file2').click()">
+                                <i class="fas fa-upload"></i> رفع صورة
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm" onclick="removeLogo(2)" id="remove-logo2" style="display:none;">
+                                <i class="fas fa-trash"></i> حذف
+                            </button>
+                        </div>
+                        <div class="form-group" style="margin-top:8px; margin-bottom:0;">
+                            <input type="text" id="logo-url2" placeholder="أو الصق رابط الشعار هنا..." oninput="handleLogoUrl(2)">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="saveTeams()" style="margin-top: 10px;">
+                <i class="fas fa-save"></i> حفظ إعدادات الفرق
+            </button>
+        </div>
+
+        <!-- Timer Card -->
+        <div class="admin-card">
+            <h2><i class="fas fa-clock"></i> إعدادات المؤقت</h2>
+            <div class="form-group">
+                <label>مدة الإجابة على كل سؤال (بالثواني)</label>
+                <div class="timer-setting">
+                    <input type="number" id="timer-input" min="5" max="120" value="30">
+                    <span>ثانية</span>
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="saveTimer()">
+                <i class="fas fa-save"></i> حفظ إعدادات المؤقت
+            </button>
+        </div>
+
+        <!-- Add Question Card -->
+        <div class="admin-card">
+            <h2><i class="fas fa-plus-circle"></i> إضافة سؤال جديد</h2>
+            <div class="form-group">
+                <label>رقم السؤال</label>
+                <input type="number" id="q-number" min="1" placeholder="رقم السؤال">
+            </div>
+            <div class="form-group">
+                <label>نص السؤال</label>
+                <textarea id="q-text" placeholder="اكتب نص السؤال هنا..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>الخيارات (حدد الإجابة الصحيحة)</label>
+                <div class="answer-options-group">
+                    <div class="answer-option-item">
+                        <input type="radio" name="correct-answer" value="0" checked>
+                        <input type="text" id="q-answer-0" placeholder="الخيار أ">
+                        <span class="correct-label">✓</span>
+                    </div>
+                    <div class="answer-option-item">
+                        <input type="radio" name="correct-answer" value="1">
+                        <input type="text" id="q-answer-1" placeholder="الخيار ب">
+                    </div>
+                    <div class="answer-option-item">
+                        <input type="radio" name="correct-answer" value="2">
+                        <input type="text" id="q-answer-2" placeholder="الخيار ج">
+                    </div>
+                    <div class="answer-option-item">
+                        <input type="radio" name="correct-answer" value="3">
+                        <input type="text" id="q-answer-3" placeholder="الخيار د">
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="addQuestion()">
+                <i class="fas fa-plus"></i> إضافة السؤال
+            </button>
+        </div>
+
+        <!-- Questions List Card -->
+        <div class="admin-card">
+            <h2><i class="fas fa-list-ol"></i> قائمة الأسئلة (<span id="questions-count">0</span>)</h2>
+            <ul class="question-list" id="questions-list">
+                <!-- Questions will be rendered here -->
+            </ul>
+        </div>
+
+        <!-- Game Control Card -->
+        <div class="admin-card">
+            <h2><i class="fas fa-gamepad"></i> التحكم بالمسابقة</h2>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="btn btn-danger" onclick="resetGame()">
+                    <i class="fas fa-redo"></i> إعادة تعيين المسابقة
+                </button>
+                <button class="btn btn-gold" onclick="resetScores()">
+                    <i class="fas fa-sync"></i> إعادة تعيين النقاط فقط
+                </button>
+                <button class="btn btn-danger" onclick="resetQuestions()">
+                    <i class="fas fa-trash"></i> حذف جميع الأسئلة
+                </button>
+                <button class="btn btn-primary" onclick="loadDefaultQuestions()">
+                    <i class="fas fa-database"></i> تحميل الأسئلة الافتراضية
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>
