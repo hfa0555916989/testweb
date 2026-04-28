@@ -16,14 +16,31 @@
         <img src="LOGO-01.jpg" alt="" class="watermark-logo">
     </div>
 
+    <!-- Password Gate -->
+    <div id="password-gate" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.85); align-items:center; justify-content:center; flex-direction:column; gap:20px;">
+        <div style="background:var(--surface,#1e2a3a); border:2px solid var(--gold,#d4af37); border-radius:16px; padding:40px 36px; text-align:center; max-width:360px; width:90%;">
+            <div style="font-size:2.5rem; margin-bottom:10px;">🔒</div>
+            <h2 style="color:var(--gold,#d4af37); margin-bottom:8px; font-family:'Cairo',sans-serif;">لوحة التحكم</h2>
+            <p style="color:#aaa; margin-bottom:20px; font-size:0.9rem;">أدخل كلمة المرور للوصول</p>
+            <input type="password" id="gate-password"
+                   placeholder="أدخل كلمة المرور"
+                   style="width:100%; padding:12px 16px; border-radius:10px; border:1px solid #444; background:#0d1621; color:#fff; font-size:1rem; font-family:'Cairo',sans-serif; text-align:center; box-sizing:border-box; margin-bottom:14px;"
+                   onkeydown="if(event.key==='Enter') checkAdminPassword()">
+            <button onclick="checkGatePassword()"
+                    style="width:100%; padding:12px; border-radius:10px; background:var(--gold,#d4af37); color:#000; font-weight:700; font-size:1rem; border:none; cursor:pointer; font-family:'Cairo',sans-serif;">
+                <i class="fas fa-unlock-alt"></i> دخول
+            </button>
+        </div>
+    </div>
+
     <div class="admin-container" id="admin-content">
         <!-- Back Link -->
         <a href="index.html" class="back-link">
-            <i class="fas fa-arrow-right"></i>
+            <i class="fas fa-arrow-left"></i>
             العودة للمسابقة
         </a>
 
-        <!-- شعارات لوحة التحكم (نفس المقاس) -->
+        <!-- شعارات لوحة التحكم -->
         <div class="admin-panel-logos">
             <div class="admin-panel-logo-wrap">
                 <img src="moe-logo.jpeg" alt="وزارة التعليم" class="admin-panel-logo">
@@ -43,7 +60,7 @@
             <p>إعدادات المسابقة والمؤقت والأسئلة</p>
         </div>
 
-        <!-- Alert -->
+        <!-- Alerts -->
         <div class="alert alert-success" id="alert-success">
             <i class="fas fa-check-circle"></i> <span id="alert-success-text">تم الحفظ بنجاح!</span>
         </div>
@@ -51,9 +68,9 @@
             <i class="fas fa-exclamation-circle"></i> <span id="alert-error-text">حدث خطأ!</span>
         </div>
 
-        <!-- Teams Card -->
+        <!-- ===== إعدادات فرق المجموعة أ ===== -->
         <div class="admin-card">
-            <h2><i class="fas fa-users"></i> إعدادات الفرق</h2>
+            <h2><i class="fas fa-users" style="color:var(--primary);"></i> إعدادات فرق المجموعة أ</h2>
             <div class="form-row">
                 <div class="form-group">
                     <label><i class="fas fa-flag" style="color: var(--team1-color);"></i> اسم الفريق الأول</label>
@@ -64,8 +81,8 @@
                     <input type="text" id="team2-name-input" placeholder="أدخل اسم الفريق الثاني">
                 </div>
             </div>
-            
-            <!-- Team Logos -->
+
+            <!-- Team Logos - Group A -->
             <div class="form-row" style="margin-top: 15px;">
                 <div class="form-group">
                     <label><i class="fas fa-image" style="color: var(--team1-color);"></i> شعار الفريق الأول</label>
@@ -118,11 +135,109 @@
             </div>
 
             <button class="btn btn-primary" onclick="saveTeams()" style="margin-top: 10px;">
-                <i class="fas fa-save"></i> حفظ إعدادات الفرق
+                <i class="fas fa-save"></i> حفظ إعدادات المجموعة أ
             </button>
         </div>
 
-        <!-- Timer Card -->
+        <!-- ===== إعدادات فرق المجموعة ب ===== -->
+        <div class="admin-card">
+            <h2><i class="fas fa-users" style="color:var(--gold,#d4af37);"></i> إعدادات فرق المجموعة ب</h2>
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-flag" style="color: var(--team1-color);"></i> اسم الفريق الثالث</label>
+                    <input type="text" id="team3-name-input" placeholder="أدخل اسم الفريق الثالث">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-flag" style="color: var(--team2-color);"></i> اسم الفريق الرابع</label>
+                    <input type="text" id="team4-name-input" placeholder="أدخل اسم الفريق الرابع">
+                </div>
+            </div>
+
+            <!-- Team Logos - Group B -->
+            <div class="form-row" style="margin-top: 15px;">
+                <div class="form-group">
+                    <label><i class="fas fa-image" style="color: var(--team1-color);"></i> شعار الفريق الثالث</label>
+                    <div class="logo-upload-area" id="logo-upload-area3">
+                        <div class="logo-preview-container">
+                            <img src="" alt="" class="logo-preview-img" id="logo-preview3" style="display:none;">
+                            <div class="logo-preview-placeholder" id="logo-placeholder3">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span>اختر صورة أو اسحبها هنا</span>
+                            </div>
+                        </div>
+                        <input type="file" id="logo-file3" accept="image/*" onchange="handleLogoUpload(3, event)" style="display:none;">
+                        <div class="logo-upload-actions">
+                            <button type="button" class="btn btn-primary btn-sm" onclick="document.getElementById('logo-file3').click()">
+                                <i class="fas fa-upload"></i> رفع صورة
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm" onclick="removeLogo(3)" id="remove-logo3" style="display:none;">
+                                <i class="fas fa-trash"></i> حذف
+                            </button>
+                        </div>
+                        <div class="form-group" style="margin-top:8px; margin-bottom:0;">
+                            <input type="text" id="logo-url3" placeholder="أو الصق رابط الشعار هنا..." oninput="handleLogoUrl(3)">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-image" style="color: var(--team2-color);"></i> شعار الفريق الرابع</label>
+                    <div class="logo-upload-area" id="logo-upload-area4">
+                        <div class="logo-preview-container">
+                            <img src="" alt="" class="logo-preview-img" id="logo-preview4" style="display:none;">
+                            <div class="logo-preview-placeholder" id="logo-placeholder4">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span>اختر صورة أو اسحبها هنا</span>
+                            </div>
+                        </div>
+                        <input type="file" id="logo-file4" accept="image/*" onchange="handleLogoUpload(4, event)" style="display:none;">
+                        <div class="logo-upload-actions">
+                            <button type="button" class="btn btn-primary btn-sm" onclick="document.getElementById('logo-file4').click()">
+                                <i class="fas fa-upload"></i> رفع صورة
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm" onclick="removeLogo(4)" id="remove-logo4" style="display:none;">
+                                <i class="fas fa-trash"></i> حذف
+                            </button>
+                        </div>
+                        <div class="form-group" style="margin-top:8px; margin-bottom:0;">
+                            <input type="text" id="logo-url4" placeholder="أو الصق رابط الشعار هنا..." oninput="handleLogoUrl(4)">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn btn-gold" onclick="saveTeamsB()" style="margin-top: 10px;">
+                <i class="fas fa-save"></i> حفظ إعدادات المجموعة ب
+            </button>
+        </div>
+
+        <!-- ===== الأسئلة الذهبية ===== -->
+        <div class="admin-card">
+            <h2><i class="fas fa-star" style="color:var(--gold,#d4af37);"></i> الأسئلة الذهبية <small style="font-size:0.75rem; color:#aaa;">(حد أقصى 4 أسئلة)</small></h2>
+            <p style="color:#aaa; font-size:0.9rem; margin-bottom:18px;">أسئلة مفتوحة يحكم عليها المشرف — اتركها فارغة لاستبعادها</p>
+
+            <div class="form-group">
+                <label><i class="fas fa-star" style="color:#d4af37;"></i> السؤال الذهبي 1</label>
+                <textarea id="golden-q-1" placeholder="اكتب نص السؤال الذهبي الأول..." rows="2"></textarea>
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-star" style="color:#d4af37;"></i> السؤال الذهبي 2</label>
+                <textarea id="golden-q-2" placeholder="اكتب نص السؤال الذهبي الثاني..." rows="2"></textarea>
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-star" style="color:#d4af37;"></i> السؤال الذهبي 3</label>
+                <textarea id="golden-q-3" placeholder="اكتب نص السؤال الذهبي الثالث..." rows="2"></textarea>
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-star" style="color:#d4af37;"></i> السؤال الذهبي 4</label>
+                <textarea id="golden-q-4" placeholder="اكتب نص السؤال الذهبي الرابع..." rows="2"></textarea>
+            </div>
+
+            <button class="btn btn-gold" onclick="saveGoldenQuestions()">
+                <i class="fas fa-save"></i> حفظ الأسئلة الذهبية
+            </button>
+        </div>
+
+        <!-- ===== إعدادات المؤقت ===== -->
         <div class="admin-card">
             <h2><i class="fas fa-clock"></i> إعدادات المؤقت</h2>
             <div class="form-group">
@@ -137,8 +252,8 @@
             </button>
         </div>
 
-        <!-- Add Question Card -->
-        <div class="admin-card">
+        <!-- ===== إضافة سؤال جديد ===== -->
+        <div class="admin-card" id="add-question-card">
             <h2><i class="fas fa-plus-circle"></i> إضافة سؤال جديد</h2>
             <div class="form-group">
                 <label>رقم السؤال</label>
@@ -175,7 +290,7 @@
             </button>
         </div>
 
-        <!-- Questions List Card -->
+        <!-- ===== قائمة الأسئلة ===== -->
         <div class="admin-card">
             <h2><i class="fas fa-list-ol"></i> قائمة الأسئلة (<span id="questions-count">0</span>)</h2>
             <ul class="question-list" id="questions-list">
@@ -183,7 +298,7 @@
             </ul>
         </div>
 
-        <!-- Game Control Card -->
+        <!-- ===== التحكم بالمسابقة ===== -->
         <div class="admin-card">
             <h2><i class="fas fa-gamepad"></i> التحكم بالمسابقة</h2>
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
@@ -201,8 +316,32 @@
                 </button>
             </div>
         </div>
-    </div>
+
+        <!-- ===== روابط المجموعات ===== -->
+        <div class="admin-card">
+            <h2><i class="fas fa-link" style="color:var(--primary);"></i> روابط المجموعات</h2>
+            <p style="color:#aaa; font-size:0.9rem; margin-bottom:18px;">افتح صفحة المسابقة الخاصة بكل مجموعة في نافذة جديدة</p>
+            <div style="display:flex; gap:14px; flex-wrap:wrap;">
+                <a id="group-page-link-a" href="index.html" target="_blank" class="btn btn-primary">
+                    <i class="fas fa-external-link-alt"></i> صفحة المجموعة أ
+                </a>
+                <a id="group-page-link-b" href="group-b.html" target="_blank" class="btn btn-gold">
+                    <i class="fas fa-external-link-alt"></i> صفحة المجموعة ب
+                </a>
+            </div>
+        </div>
+
+    </div><!-- end admin-container -->
 
     <script src="admin.js"></script>
+    <script>
+        // Initial gate check before admin.js loads
+        (function () {
+            if (sessionStorage.getItem('auth_sscf') !== '1') {
+                document.getElementById('admin-content').style.display = 'none';
+                document.getElementById('password-gate').style.display = 'flex';
+            }
+        })();
+    </script>
 </body>
 </html>
