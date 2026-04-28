@@ -105,55 +105,165 @@ class SoundEffects {
         setTimeout(() => this.playTone(800, 0.15, 'sine', 0.2), 160);
     }
 
-    // White noise buffer 2s with bandpass at 2000 Hz — simulates crowd applause
+    // Realistic rhythmic clapping — individual snap bursts timed like a crowd
     playApplause() {
         this.init();
         if (!this.audioCtx) return;
-        const sampleRate = this.audioCtx.sampleRate;
-        const bufferSize = sampleRate * 2;
-        const buffer = this.audioCtx.createBuffer(1, bufferSize, sampleRate);
-        const data = buffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) {
-            data[i] = Math.random() * 2 - 1;
+        const ctx = this.audioCtx;
+        const now = ctx.currentTime;
+        const clapCount = 7;
+        for (let c = 0; c < clapCount; c++) {
+            const t = now + c * 0.27;
+            const bufSize = Math.floor(ctx.sampleRate * 0.08);
+            const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+            const data = buf.getChannelData(0);
+            for (let i = 0; i < bufSize; i++) {
+                data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufSize * 0.2));
+            }
+            const src = ctx.createBufferSource();
+            src.buffer = buf;
+
+            const hp = ctx.createBiquadFilter();
+            hp.type = 'highpass';
+            hp.frequency.value = 900;
+
+            const bp = ctx.createBiquadFilter();
+            bp.type = 'bandpass';
+            bp.frequency.value = 2200;
+            bp.Q.value = 0.55;
+
+            const g = ctx.createGain();
+            g.gain.setValueAtTime(0.75, t);
+            g.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
+
+            src.connect(hp);
+            hp.connect(bp);
+            bp.connect(g);
+            g.connect(ctx.destination);
+            src.start(t);
+            src.stop(t + 0.1);
         }
-        const source = this.audioCtx.createBufferSource();
-        source.buffer = buffer;
-
-        const filter = this.audioCtx.createBiquadFilter();
-        filter.type = 'bandpass';
-        filter.frequency.value = 2000;
-        filter.Q.value = 0.5;
-
-        const gain = this.audioCtx.createGain();
-        gain.gain.setValueAtTime(0.35, this.audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, this.audioCtx.currentTime + 2);
-
-        source.connect(filter);
-        filter.connect(gain);
-        gain.connect(this.audioCtx.destination);
-        source.start();
-        source.stop(this.audioCtx.currentTime + 2);
     }
 
-    // Applause burst + celebratory melody + confetti
+    // Single firework: whistle up → bang → sparkle tones
+    _fireworkBurst(ctx, delay) {
+        const t = ctx.currentTime + delay;
+
+        // Ascending whistle
+        const osc = ctx.createOscillator();
+        const og = ctx.createGain();
+        osc.connect(og); og.connect(ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(300 + Math.random() * 200, t);
+        osc.frequency.linearRampToValueAtTime(1000 + Math.random() * 600, t + 0.28);
+        og.gain.setValueAtTime(0.13, t);
+        og.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
+        osc.start(t); osc.stop(t + 0.28);
+
+        // Explosion noise
+        const bangT = t + 0.28;
+        const bufSize = Math.floor(ctx.sampleRate * 0.18);
+        const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+        const d = buf.getChannelData(0);
+        for (let i = 0; i < bufSize; i++) {
+            d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufSize * 0.12));
+        }
+        const src = ctx.createBufferSource();
+        src.buffer = buf;
+        const bg = ctx.createGain();
+        bg.gain.setValueAtTime(1.0, bangT);
+        bg.gain.exponentialRampToValueAtTime(0.001, bangT + 0.22);
+        src.connect(bg); bg.connect(ctx.destination);
+        src.start(bangT); src.stop(bangT + 0.22);
+
+        // Sparkle tones after bang
+        for (let s = 0; s < 5; s++) {
+            const st = bangT + 0.04 + s * 0.07;
+            const freq = 500 + Math.random() * 2200;
+            const so = ctx.createOscillator();
+            const sg = ctx.createGain();
+            so.connect(sg); sg.connect(ctx.destination);
+            so.type = 'sine';
+            so.frequency.setValueAtTime(freq, st);
+            so.frequency.exponentialRampToValueAtTime(freq * 0.35, st + 0.5);
+            sg.gain.setValueAtTime(0.13, st);
+            sg.gain.exponentialRampToValueAtTime(0.001, st + 0.5);
+            so.start(st); so.stop(st + 0.5);
+        }
+    }
+
+    // Multiple fireworks spread over ~3 s
+    playFireworks() {
+        this.init();
+        if (!this.audioCtx) return;
+        const ctx = this.audioCtx;
+        [0, 0.45, 0.85, 1.25, 1.65, 2.1, 2.55].forEach(d => this._fireworkBurst(ctx, d));
+    }
+
+    // Loud sustained clapping with crowd roar — for winner
+    playStrongApplause() {
+        this.init();
+        if (!this.audioCtx) return;
+        const ctx = this.audioCtx;
+        const now = ctx.currentTime;
+
+        // 15 rapid individual claps
+        for (let c = 0; c < 15; c++) {
+            const t = now + c * 0.21;
+            const bufSize = Math.floor(ctx.sampleRate * 0.09);
+            const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+            const data = buf.getChannelData(0);
+            for (let i = 0; i < bufSize; i++) {
+                data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufSize * 0.22));
+            }
+            const src = ctx.createBufferSource();
+            src.buffer = buf;
+
+            const hp = ctx.createBiquadFilter();
+            hp.type = 'highpass';
+            hp.frequency.value = 700;
+
+            const bp = ctx.createBiquadFilter();
+            bp.type = 'bandpass';
+            bp.frequency.value = 1800 + Math.random() * 700;
+            bp.Q.value = 0.5;
+
+            const g = ctx.createGain();
+            g.gain.setValueAtTime(0.95, t);
+            g.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+
+            src.connect(hp); hp.connect(bp); bp.connect(g);
+            g.connect(ctx.destination);
+            src.start(t); src.stop(t + 0.12);
+        }
+
+        // Background crowd roar layer
+        const crowdDur = 4.2;
+        const crowdBuf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * crowdDur), ctx.sampleRate);
+        const cd = crowdBuf.getChannelData(0);
+        for (let i = 0; i < cd.length; i++) cd[i] = Math.random() * 2 - 1;
+
+        const crowdSrc = ctx.createBufferSource();
+        crowdSrc.buffer = crowdBuf;
+
+        const cf = ctx.createBiquadFilter();
+        cf.type = 'bandpass'; cf.frequency.value = 700; cf.Q.value = 0.15;
+
+        const cg = ctx.createGain();
+        cg.gain.setValueAtTime(0, now);
+        cg.gain.linearRampToValueAtTime(0.22, now + 0.9);
+        cg.gain.setValueAtTime(0.22, now + crowdDur - 1.3);
+        cg.gain.exponentialRampToValueAtTime(0.001, now + crowdDur);
+
+        crowdSrc.connect(cf); cf.connect(cg); cg.connect(ctx.destination);
+        crowdSrc.start(now); crowdSrc.stop(now + crowdDur);
+    }
+
+    // Winner celebration: fireworks + strong applause + confetti
     playCelebrationFanfare() {
         this.init();
-        this.playApplause();
-
-        const fanfare = [523, 659, 784, 1047, 1319, 1047, 784, 1047];
-        fanfare.forEach((note, i) => {
-            setTimeout(() => {
-                this.playTone(note, 0.3, 'sine', 0.4);
-                this.playTone(note * 1.25, 0.2, 'triangle', 0.2);
-            }, i * 180 + 300);
-        });
-
-        setTimeout(() => {
-            this.playTone(1047, 0.6, 'sine', 0.45);
-            this.playTone(1319, 0.6, 'triangle', 0.25);
-            this.playTone(1568, 0.6, 'sine', 0.2);
-        }, 2000);
-
+        this.playFireworks();
+        this.playStrongApplause();
         if (confetti) {
             confetti.start();
             setTimeout(() => { if (confetti) confetti.stop(); }, 6000);
@@ -520,7 +630,6 @@ function judgeGolden(isCorrect) {
     if (judgeEl) judgeEl.style.display = 'none';
 
     if (isCorrect) {
-        sounds.playCorrect();
         sounds.playApplause();
         if (currentGoldenTeam === 1) gameState.team1.score++;
         else gameState.team2.score++;
@@ -1007,7 +1116,6 @@ function checkAnswer(selectedIdx) {
 
     if (isCorrect) {
         answerBtns[selectedIdx].classList.add('correct');
-        sounds.playCorrect();
         sounds.playApplause();
 
         if (gameState.currentTeam === 1) gameState.team1.score++;
@@ -1124,9 +1232,7 @@ function showWinner() {
     if (modal) modal.classList.add('active');
 
     confetti.start();
-    sounds.playApplause();
     sounds.playCelebrationFanfare();
-    setTimeout(() => sounds.playCelebration(), 3500);
 }
 
 function restartCompetition() {
