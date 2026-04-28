@@ -780,19 +780,26 @@ function showSpinWheelModal() {
     const modal = document.getElementById('spin-wheel-modal');
     if (!modal) return;
 
-    // Hide any previous result
     const resultEl = document.getElementById('spin-result');
     if (resultEl) resultEl.style.display = 'none';
 
-    modal.classList.add('active');
+    const spinBtn = document.getElementById('spin-btn');
+    if (spinBtn) spinBtn.disabled = false;
 
-    // Draw initial wheel after the canvas is visible
-    setTimeout(() => drawWheel(wheelAngle), 50);
+    // Use both class and inline style to guarantee visibility
+    modal.classList.add('active');
+    modal.style.display = 'flex';
+    modal.style.zIndex  = '9000';
+
+    setTimeout(() => drawWheel(wheelAngle), 80);
 }
 
 function closeSpinModal() {
     const modal = document.getElementById('spin-wheel-modal');
-    if (modal) modal.classList.remove('active');
+    if (!modal) return;
+    modal.classList.remove('active');
+    modal.style.display = 'none';
+    wheelSpinning = false;
 }
 
 function showSpinResult(teamNum) {
