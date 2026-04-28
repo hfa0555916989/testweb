@@ -12,6 +12,38 @@ class SoundEffects {
     constructor() {
         this.audioCtx = null;
         this.initialized = false;
+        // Real audio files
+        this._applauseAudio   = null;
+        this._cheersAudio     = null;
+        this._fireworksAudio  = null;
+        this._preloadAudio();
+    }
+
+    _preloadAudio() {
+        const load = (src) => {
+            const a = new Audio(src);
+            a.preload = 'auto';
+            return a;
+        };
+        try {
+            this._applauseAudio  = load('vvqne-applause-383901.mp3');
+            this._cheersAudio    = load('storegraphic-crowd-cheers-314919.mp3');
+            this._fireworksAudio = load('dragon-studio-fireworks-07-419025.mp3');
+        } catch(e) {}
+    }
+
+    _playFile(audio, volume = 1.0) {
+        if (!audio) return;
+        try {
+            audio.currentTime = 0;
+            audio.volume = volume;
+            audio.play().catch(() => {});
+        } catch(e) {}
+    }
+
+    _stopFile(audio) {
+        if (!audio) return;
+        try { audio.pause(); audio.currentTime = 0; } catch(e) {}
     }
 
     init() {
@@ -133,40 +165,7 @@ class SoundEffects {
     }
 
     playApplause() {
-        this.init();
-        if (!this.audioCtx) return;
-        const ctx = this.audioCtx;
-        const dur = 2.8;
-        // 4 LFOs at slightly different rates → each "voice" claps at its own rhythm
-        const buf = this._pinkNoiseBuffer(ctx, dur,
-            [5.4, 5.8, 6.2, 5.0],
-            [0,   0.6, 1.3, 2.0]);
-
-        const src = ctx.createBufferSource();
-        src.buffer = buf;
-
-        const hp = ctx.createBiquadFilter();
-        hp.type = 'highpass'; hp.frequency.value = 450;
-
-        const pk1 = ctx.createBiquadFilter();
-        pk1.type = 'peaking'; pk1.frequency.value = 1100; pk1.gain.value = 12; pk1.Q.value = 0.8;
-
-        const pk2 = ctx.createBiquadFilter();
-        pk2.type = 'peaking'; pk2.frequency.value = 2600; pk2.gain.value = 7; pk2.Q.value = 1.2;
-
-        const lp = ctx.createBiquadFilter();
-        lp.type = 'lowpass'; lp.frequency.value = 6500;
-
-        const gain = ctx.createGain();
-        const now = ctx.currentTime;
-        gain.gain.setValueAtTime(0, now);
-        gain.gain.linearRampToValueAtTime(0.72, now + 0.08);
-        gain.gain.setValueAtTime(0.72, now + dur - 0.5);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
-
-        src.connect(hp); hp.connect(pk1); pk1.connect(pk2); pk2.connect(lp);
-        lp.connect(gain); gain.connect(ctx.destination);
-        src.start(now); src.stop(now + dur);
+        this._playFile(this._applauseAudio, 1.0);
     }
 
     // Single firework: whistle up → bang → sparkle tones
@@ -216,74 +215,15 @@ class SoundEffects {
         }
     }
 
-    // Multiple fireworks spread over ~3 s
+    // Real fireworks audio file
     playFireworks() {
-        this.init();
-        if (!this.audioCtx) return;
-        const ctx = this.audioCtx;
-        [0, 0.45, 0.85, 1.25, 1.65, 2.1, 2.55].forEach(d => this._fireworkBurst(ctx, d));
+        this._playFile(this._fireworksAudio, 1.0);
     }
 
-    // Loud sustained crowd applause for winner — 6 LFO voices + low roar layer
-    playStrongApplause() {
-        this.init();
-        if (!this.audioCtx) return;
-        const ctx = this.audioCtx;
-        const dur = 5.0;
-        const now = ctx.currentTime;
-
-        // Main applause: 6 LFO voices → big excited crowd feel
-        const mainBuf = this._pinkNoiseBuffer(ctx, dur,
-            [5.3, 5.7, 6.0, 6.3, 5.0, 6.6],
-            [0,   0.5, 1.1, 1.8, 2.5, 3.2]);
-        const mainSrc = ctx.createBufferSource();
-        mainSrc.buffer = mainBuf;
-
-        const hp = ctx.createBiquadFilter();
-        hp.type = 'highpass'; hp.frequency.value = 350;
-
-        const pk1 = ctx.createBiquadFilter();
-        pk1.type = 'peaking'; pk1.frequency.value = 1100; pk1.gain.value = 14; pk1.Q.value = 0.7;
-
-        const pk2 = ctx.createBiquadFilter();
-        pk2.type = 'peaking'; pk2.frequency.value = 2600; pk2.gain.value = 9;  pk2.Q.value = 1.0;
-
-        const lp = ctx.createBiquadFilter();
-        lp.type = 'lowpass'; lp.frequency.value = 7500;
-
-        const mainGain = ctx.createGain();
-        mainGain.gain.setValueAtTime(0, now);
-        mainGain.gain.linearRampToValueAtTime(0.92, now + 0.25);
-        mainGain.gain.setValueAtTime(0.92, now + dur - 1.2);
-        mainGain.gain.exponentialRampToValueAtTime(0.001, now + dur);
-
-        mainSrc.connect(hp); hp.connect(pk1); pk1.connect(pk2); pk2.connect(lp);
-        lp.connect(mainGain); mainGain.connect(ctx.destination);
-        mainSrc.start(now); mainSrc.stop(now + dur);
-
-        // Low crowd-roar layer (adds warmth/body like a stadium)
-        const roarBuf = this._pinkNoiseBuffer(ctx, dur, [0.8, 1.2], [0, 1.5]);
-        const roarSrc = ctx.createBufferSource();
-        roarSrc.buffer = roarBuf;
-
-        const roarLp = ctx.createBiquadFilter();
-        roarLp.type = 'lowpass'; roarLp.frequency.value = 500;
-
-        const roarGain = ctx.createGain();
-        roarGain.gain.setValueAtTime(0, now);
-        roarGain.gain.linearRampToValueAtTime(0.28, now + 0.6);
-        roarGain.gain.setValueAtTime(0.28, now + dur - 1.5);
-        roarGain.gain.exponentialRampToValueAtTime(0.001, now + dur);
-
-        roarSrc.connect(roarLp); roarLp.connect(roarGain); roarGain.connect(ctx.destination);
-        roarSrc.start(now); roarSrc.stop(now + dur);
-    }
-
-    // Winner celebration: fireworks + strong applause + confetti
+    // Winner celebration: fireworks + crowd cheers + confetti
     playCelebrationFanfare() {
-        this.init();
-        this.playFireworks();
-        this.playStrongApplause();
+        this._playFile(this._fireworksAudio, 1.0);
+        setTimeout(() => this._playFile(this._cheersAudio, 1.0), 800);
         if (confetti) {
             confetti.start();
             setTimeout(() => { if (confetti) confetti.stop(); }, 6000);
