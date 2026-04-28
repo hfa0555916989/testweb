@@ -23,22 +23,20 @@ class SoundEffects {
         const load = (src) => {
             const a = new Audio(src);
             a.preload = 'auto';
+            a.onerror = () => console.warn('Audio load failed:', src);
             return a;
         };
-        try {
-            this._applauseAudio  = load('vvqne-applause-383901.mp3');
-            this._cheersAudio    = load('storegraphic-crowd-cheers-314919.mp3');
-            this._fireworksAudio = load('dragon-studio-fireworks-07-419025.mp3');
-        } catch(e) {}
+        this._applauseAudio  = load('vvqne-applause-383901.mp3');
+        this._cheersAudio    = load('storegraphic-crowd-cheers-314919.mp3');
+        this._fireworksAudio = load('dragon-studio-fireworks-07-419025.mp3');
     }
 
     _playFile(audio, volume = 1.0) {
         if (!audio) return;
-        try {
-            audio.currentTime = 0;
-            audio.volume = volume;
-            audio.play().catch(() => {});
-        } catch(e) {}
+        audio.currentTime = 0;
+        audio.volume = Math.min(1, Math.max(0, volume));
+        const p = audio.play();
+        if (p && p.catch) p.catch(e => console.warn('Audio play failed:', e));
     }
 
     _stopFile(audio) {
