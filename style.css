@@ -4,23 +4,23 @@
    ============================ */
 
 :root {
-    --primary: #1a6b3c;
-    --primary-light: #2e8b57;
-    --primary-dark: #0d4f2b;
-    --gold: #d4af37;
-    --gold-light: #f0d060;
-    --gold-dark: #b8960c;
-    --team1-color: #1565c0;
-    --team1-light: #42a5f5;
-    --team1-dark: #0d47a1;
-    --team2-color: #c62828;
-    --team2-light: #ef5350;
-    --team2-dark: #b71c1c;
-    --bg-cream: #f5f0e1;
-    --text-dark: #1a1a2e;
+    --primary: #009B8D;
+    --primary-light: #00B5A5;
+    --primary-dark: #007A6E;
+    --gold: #C8960C;
+    --gold-light: #E6B020;
+    --gold-dark: #A67A08;
+    --team1-color: #C8960C;
+    --team1-light: #E6B020;
+    --team1-dark: #A67A08;
+    --team2-color: #009B8D;
+    --team2-light: #00B5A5;
+    --team2-dark: #007A6E;
+    --bg-cream: #F8F5EE;
+    --text-dark: #1A2A28;
     --text-light: #ffffff;
-    --correct: #2e7d32;
-    --wrong: #c62828;
+    --correct: #3D8B37;
+    --wrong: #C0392B;
     --shadow: 0 10px 40px rgba(0,0,0,0.2);
     --shadow-sm: 0 4px 15px rgba(0,0,0,0.1);
 }
@@ -47,9 +47,9 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: 
-        linear-gradient(135deg, rgba(26,107,60,0.03) 0%, rgba(212,175,55,0.05) 50%, rgba(26,107,60,0.03) 100%),
-        url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%231a6b3c' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    background:
+        linear-gradient(135deg, rgba(0,155,141,0.03) 0%, rgba(200,150,12,0.05) 50%, rgba(61,139,55,0.03) 100%),
+        url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23009B8D' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
     z-index: 0;
     pointer-events: none;
 }
@@ -98,12 +98,12 @@ body::before {
     height: 6px;
     background: repeating-linear-gradient(
         90deg,
-        var(--primary) 0px,
-        var(--primary) 20px,
-        var(--gold) 20px,
-        var(--gold) 40px,
-        var(--primary-light) 40px,
-        var(--primary-light) 60px
+        #009B8D 0px,
+        #009B8D 20px,
+        #C8960C 20px,
+        #C8960C 40px,
+        #3D8B37 40px,
+        #3D8B37 60px
     );
     z-index: 1000;
 }
@@ -218,13 +218,13 @@ body::before {
 
 .team-1 {
     background: linear-gradient(135deg, var(--team1-color), var(--team1-dark));
-    box-shadow: 0 10px 30px rgba(21,101,192,0.3);
+    box-shadow: 0 10px 30px rgba(200,150,12,0.35);
     color: white;
 }
 
 .team-2 {
     background: linear-gradient(135deg, var(--team2-color), var(--team2-dark));
-    box-shadow: 0 10px 30px rgba(198,40,40,0.3);
+    box-shadow: 0 10px 30px rgba(0,155,141,0.35);
     color: white;
 }
 
@@ -512,11 +512,11 @@ body::before {
 }
 
 /* Numbered colors cycling */
-.number-cell:nth-child(5n+1) { background: linear-gradient(145deg, #1565c0, #0d47a1); box-shadow: 0 6px 20px rgba(21,101,192,0.3); }
-.number-cell:nth-child(5n+2) { background: linear-gradient(145deg, #2e7d32, #1b5e20); box-shadow: 0 6px 20px rgba(46,125,50,0.3); }
-.number-cell:nth-child(5n+3) { background: linear-gradient(145deg, #c62828, #b71c1c); box-shadow: 0 6px 20px rgba(198,40,40,0.3); }
-.number-cell:nth-child(5n+4) { background: linear-gradient(145deg, #6a1b9a, #4a148c); box-shadow: 0 6px 20px rgba(106,27,154,0.3); }
-.number-cell:nth-child(5n+5) { background: linear-gradient(145deg, #e65100, #bf360c); box-shadow: 0 6px 20px rgba(230,81,0,0.3); }
+.number-cell:nth-child(5n+1) { background: linear-gradient(145deg, #009B8D, #007A6E); box-shadow: 0 6px 20px rgba(0,155,141,0.35); }
+.number-cell:nth-child(5n+2) { background: linear-gradient(145deg, #C8960C, #A67A08); box-shadow: 0 6px 20px rgba(200,150,12,0.35); }
+.number-cell:nth-child(5n+3) { background: linear-gradient(145deg, #3D8B37, #2A6B26); box-shadow: 0 6px 20px rgba(61,139,55,0.35); }
+.number-cell:nth-child(5n+4) { background: linear-gradient(145deg, #00766B, #005549); box-shadow: 0 6px 20px rgba(0,118,107,0.35); }
+.number-cell:nth-child(5n+5) { background: linear-gradient(145deg, #E6B020, #C8960C); box-shadow: 0 6px 20px rgba(230,176,32,0.35); }
 
 /* Golden cells always gold regardless of nth-child position */
 .number-cell.golden-cell,
@@ -853,12 +853,12 @@ body::before {
 
 .team1-btn {
     background: linear-gradient(135deg, var(--team1-color), var(--team1-dark));
-    box-shadow: 0 8px 25px rgba(21,101,192,0.3);
+    box-shadow: 0 8px 25px rgba(200,150,12,0.35);
 }
 
 .team2-btn {
     background: linear-gradient(135deg, var(--team2-color), var(--team2-dark));
-    box-shadow: 0 8px 25px rgba(198,40,40,0.3);
+    box-shadow: 0 8px 25px rgba(0,155,141,0.35);
 }
 
 .team-select-btn:hover {
@@ -866,11 +866,11 @@ body::before {
 }
 
 .team1-btn:hover {
-    box-shadow: 0 15px 40px rgba(21,101,192,0.5);
+    box-shadow: 0 15px 40px rgba(200,150,12,0.55);
 }
 
 .team2-btn:hover {
-    box-shadow: 0 15px 40px rgba(198,40,40,0.5);
+    box-shadow: 0 15px 40px rgba(0,155,141,0.55);
 }
 
 /* ====== WINNER MODAL ====== */
