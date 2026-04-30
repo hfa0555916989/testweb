@@ -1198,12 +1198,18 @@ function showWinner() {
 function restartCompetition() {
     gameState.team1.score = 0;
     gameState.team2.score = 0;
+    gameState.team1.name = 'الفريق الأول';
+    gameState.team2.name = 'الفريق الثاني';
+    gameState.team1.logo = '';
+    gameState.team2.logo = '';
     gameState.usedQuestions = [];
     gameState.answeredCount = 0;
     gameState.currentQuestion = null;
     gameState.currentTeam = null;
 
     localStorage.removeItem(KEY('quiz_progress'));
+    localStorage.removeItem(KEY('quiz_teams'));
+    localStorage.removeItem(KEY('quiz_logos'));
 
     confetti.stop();
 
@@ -1213,6 +1219,7 @@ function restartCompetition() {
     renderGrid();
     updateScoreboard();
     updateTurnIndicator();
+    setTimeout(() => showSpinWheelModal(), 600);
 }
 
 // ====== Listen for storage changes (from admin) ======
