@@ -176,7 +176,7 @@ function handleLogoUpload(teamNum, event) {
 
     const reader = new FileReader();
     reader.onload = function(e) {
-        resizeImage(e.target.result, 200, function(resizedData) {
+        resizeImage(e.target.result, 500, function(resizedData) {
             if (teamNum <= 2) {
                 teamLogos[`team${teamNum}`] = resizedData;
             } else {
