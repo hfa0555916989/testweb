@@ -508,27 +508,29 @@ function renderGrid() {
 
         grid.appendChild(cell);
     }
-}
 
-// ====== Golden Questions Grid ======
-function renderGoldenGrid() {
-    const section = document.getElementById('golden-section');
-    const grid = document.getElementById('golden-grid');
-    if (!grid) return;
-
-    // Always show the golden section (4 boxes guaranteed)
-    if (section) section.style.display = '';
-    grid.innerHTML = '';
-
-    goldenQuestions.forEach(q => {
+    // Golden questions merged into the same grid with gold styling
+    for (let i = 1; i <= 4; i++) {
+        const id = `g${i}`;
         const cell = document.createElement('div');
         cell.className = 'number-cell golden-cell';
-        cell.setAttribute('data-golden-id', q.id);
-        const num = q.id.replace('g', '');
-        cell.innerHTML = `<i class="fas fa-star"></i><span>${num}</span>`;
-        cell.addEventListener('click', () => selectGoldenQuestion(q.id));
+        cell.setAttribute('data-golden-id', id);
+        cell.innerHTML = `<i class="fas fa-star"></i><span>${i}</span>`;
+
+        const q = goldenQuestions.find(gq => gq.id === id);
+        if (q) {
+            cell.addEventListener('click', () => selectGoldenQuestion(id));
+        } else {
+            cell.classList.add('used');
+        }
+
         grid.appendChild(cell);
-    });
+    }
+}
+
+// ====== Golden Questions Grid (merged into main grid) ======
+function renderGoldenGrid() {
+    // Golden questions are now rendered inside renderGrid()
 }
 
 function selectGoldenQuestion(id) {

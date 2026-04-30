@@ -518,6 +518,19 @@ body::before {
 .number-cell:nth-child(5n+4) { background: linear-gradient(145deg, #6a1b9a, #4a148c); box-shadow: 0 6px 20px rgba(106,27,154,0.3); }
 .number-cell:nth-child(5n+5) { background: linear-gradient(145deg, #e65100, #bf360c); box-shadow: 0 6px 20px rgba(230,81,0,0.3); }
 
+/* Golden cells always gold regardless of nth-child position */
+.number-cell.golden-cell,
+.number-cell.golden-cell:nth-child(5n+1),
+.number-cell.golden-cell:nth-child(5n+2),
+.number-cell.golden-cell:nth-child(5n+3),
+.number-cell.golden-cell:nth-child(5n+4),
+.number-cell.golden-cell:nth-child(5n+5) {
+    background: linear-gradient(145deg, #f0c040, #c8960c);
+    box-shadow: 0 6px 20px rgba(212,175,55,0.45);
+    flex-direction: column;
+    font-size: 1.4rem;
+}
+
 /* ====== MODALS ====== */
 .modal-overlay {
     position: fixed;

@@ -179,13 +179,18 @@ function handleLogoUpload(teamNum, event) {
         resizeImage(e.target.result, 500, function(resizedData) {
             if (teamNum <= 2) {
                 teamLogos[`team${teamNum}`] = resizedData;
+                localStorage.setItem('quiz_logos', JSON.stringify(teamLogos));
             } else {
                 teamLogosB[`team${teamNum}`] = resizedData;
+                localStorage.setItem('quiz_logos_b', JSON.stringify({
+                    team1: teamLogosB.team3 || '',
+                    team2: teamLogosB.team4 || ''
+                }));
             }
             showLogoPreview(teamNum, resizedData);
             const urlInput = document.getElementById(`logo-url${teamNum}`);
             if (urlInput) urlInput.value = '';
-            showAlert('success', `تم تحميل شعار الفريق ${teamNames[teamNum]} — اضغط حفظ للتطبيق`);
+            showAlert('success', `تم تحميل شعار الفريق ${teamNames[teamNum]} بنجاح!`);
         });
     };
     reader.readAsDataURL(file);
