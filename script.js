@@ -164,6 +164,7 @@ class SoundEffects {
 
     playApplause() {
         this._playFile(this._applauseAudio, 1.0);
+        setTimeout(() => this._stopFile(this._applauseAudio), 3000);
     }
 
     // Single firework: whistle up → bang → sparkle tones
@@ -342,7 +343,10 @@ let gameState = {
     timerRemaining: 30,
     timerInterval: null,
     totalQuestions: 20,
-    answeredCount: 0
+    answeredCount: 0,
+    currentTurn: null,
+    answeredBy: {},
+    goldenPhaseStarted: false
 };
 
 // ====== Golden Questions State ======
@@ -463,6 +467,9 @@ function loadGameData() {
         gameState.team2.score = progress.team2Score || 0;
         gameState.usedQuestions = progress.usedQuestions || [];
         gameState.answeredCount = progress.answeredCount || 0;
+        gameState.currentTurn = progress.currentTurn || null;
+        gameState.answeredBy = progress.answeredBy || {};
+        gameState.goldenPhaseStarted = progress.goldenPhaseStarted || false;
     }
 
     // Load golden questions — always keep 4 slots
@@ -484,7 +491,10 @@ function saveProgress() {
         team1Score: gameState.team1.score,
         team2Score: gameState.team2.score,
         usedQuestions: gameState.usedQuestions,
-        answeredCount: gameState.answeredCount
+        answeredCount: gameState.answeredCount,
+        currentTurn: gameState.currentTurn,
+        answeredBy: gameState.answeredBy,
+        goldenPhaseStarted: gameState.goldenPhaseStarted
     }));
 }
 
@@ -501,7 +511,14 @@ function renderGrid() {
         cell.textContent = i;
 
         if (gameState.usedQuestions.includes(i)) {
-            cell.classList.add('used');
+            const teamWho = gameState.answeredBy[i];
+            if (teamWho === 1) {
+                cell.classList.add('answered-team1');
+            } else if (teamWho === 2) {
+                cell.classList.add('answered-team2');
+            } else {
+                cell.classList.add('used');
+            }
         } else {
             cell.addEventListener('click', () => selectNumber(i));
         }
@@ -580,10 +597,11 @@ function showGoldenQuestion() {
     if (judgeEl) judgeEl.style.display = '';
 
     modal.classList.add('active');
-    // No timer for golden questions
+    startGoldenTimer();
 }
 
 function judgeGolden(isCorrect) {
+    stopGoldenTimer();
     const modal = document.getElementById('golden-question-modal');
     const resultEl = document.getElementById('golden-result');
     const judgeEl = document.getElementById('golden-judge-buttons');
@@ -629,6 +647,7 @@ function judgeGolden(isCorrect) {
         currentGoldenQuestion = null;
         currentGoldenTeam = null;
         saveProgress();
+        checkAllDone();
     }, 3000);
 }
 
@@ -707,6 +726,8 @@ function handleGoldenTimeout() {
         if (modal) modal.classList.remove('active');
         currentGoldenQuestion = null;
         currentGoldenTeam = null;
+        saveProgress();
+        checkAllDone();
     }, 3000);
 }
 
@@ -880,7 +901,9 @@ function showSpinResult(teamNum) {
     resultEl.style.display = '';
     resultEl.className = 'question-result show correct';
 
-    sounds.playApplause();
+    gameState.currentTurn = teamNum;
+    saveProgress();
+    updateTurnIndicator();
 }
 
 // ====== Update UI ======
@@ -922,7 +945,21 @@ function setLogoDisplay(imgId, fallbackId, logoSrc) {
 
 function updateTurnIndicator() {
     const text = document.getElementById('turn-text');
-    if (text) text.textContent = `اختر رقماً للسؤال التالي`;
+    const team1Board = document.getElementById('team1-board');
+    const team2Board = document.getElementById('team2-board');
+
+    if (team1Board) team1Board.classList.remove('current-turn');
+    if (team2Board) team2Board.classList.remove('current-turn');
+
+    if (gameState.currentTurn === 1) {
+        if (text) text.textContent = `دور ${gameState.team1.name}`;
+        if (team1Board) team1Board.classList.add('current-turn');
+    } else if (gameState.currentTurn === 2) {
+        if (text) text.textContent = `دور ${gameState.team2.name}`;
+        if (team2Board) team2Board.classList.add('current-turn');
+    } else {
+        if (text) text.textContent = `اختر رقماً للسؤال التالي`;
+    }
 }
 
 function animateScore(teamNum) {
@@ -1103,7 +1140,7 @@ function checkAnswer(selectedIdx) {
         `;
     }
 
-    markQuestionUsed(q.id);
+    markQuestionUsed(q.id, gameState.currentTeam);
 
     setTimeout(() => {
         hideQuestionModal();
@@ -1126,7 +1163,7 @@ function handleTimeout() {
         <div class="result-text">انتهى الوقت! الإجابة الصحيحة: ${q.answers[q.correct]}</div>
     `;
 
-    markQuestionUsed(q.id);
+    markQuestionUsed(q.id, 0);
 
     setTimeout(() => {
         hideQuestionModal();
@@ -1134,17 +1171,30 @@ function handleTimeout() {
     }, 3000);
 }
 
-function markQuestionUsed(id) {
+function markQuestionUsed(id, teamNum) {
     gameState.usedQuestions.push(id);
     gameState.answeredCount++;
+    if (teamNum) gameState.answeredBy[id] = teamNum;
 
     const cell = document.querySelector(`.number-cell[data-number="${id}"]`);
     if (cell) {
         cell.classList.add('disappearing');
         setTimeout(() => {
             cell.classList.remove('disappearing');
-            cell.classList.add('used');
+            if (teamNum === 1) {
+                cell.classList.add('answered-team1');
+            } else if (teamNum === 2) {
+                cell.classList.add('answered-team2');
+            } else {
+                cell.classList.add('used');
+            }
         }, 800);
+    }
+
+    // Alternate turns after each question
+    if (gameState.currentTurn) {
+        gameState.currentTurn = gameState.currentTurn === 1 ? 2 : 1;
+        updateTurnIndicator();
     }
 
     saveProgress();
@@ -1153,8 +1203,41 @@ function markQuestionUsed(id) {
 // ====== Game End ======
 function checkGameEnd() {
     if (gameState.answeredCount >= gameState.totalQuestions) {
+        const goldenRemaining = goldenQuestions.length;
+        if (goldenRemaining > 0 && !gameState.goldenPhaseStarted) {
+            gameState.goldenPhaseStarted = true;
+            saveProgress();
+            setTimeout(() => showGoldenPhaseWheel(), 800);
+        } else {
+            checkAllDone();
+        }
+    }
+}
+
+function checkAllDone() {
+    if (gameState.answeredCount >= gameState.totalQuestions && goldenQuestions.length === 0) {
         setTimeout(() => showWinner(), 500);
     }
+}
+
+function showGoldenPhaseWheel() {
+    const modal = document.getElementById('spin-wheel-modal');
+    if (!modal) { return; }
+
+    const h2 = modal.querySelector('h2');
+    if (h2) h2.innerHTML = '<i class="fas fa-star" style="color:var(--gold)"></i> القرعة للأسئلة الذهبية';
+
+    const resultEl = document.getElementById('spin-result');
+    if (resultEl) resultEl.style.display = 'none';
+
+    const spinBtn = document.getElementById('spin-btn');
+    if (spinBtn) spinBtn.disabled = false;
+
+    modal.classList.add('active');
+    modal.style.display = 'flex';
+    modal.style.zIndex = '9000';
+
+    setTimeout(() => drawWheel(wheelAngle), 80);
 }
 
 function showWinner() {
@@ -1191,8 +1274,10 @@ function showWinner() {
 
     if (modal) modal.classList.add('active');
 
-    confetti.start();
-    sounds.playCelebrationFanfare();
+    if (winnerName !== 'تعادل! 🤝') {
+        confetti.start();
+        sounds.playCelebrationFanfare();
+    }
 }
 
 function restartCompetition() {
@@ -1210,11 +1295,33 @@ function restartCompetition() {
     localStorage.removeItem(KEY('quiz_progress'));
     localStorage.removeItem(KEY('quiz_teams'));
     localStorage.removeItem(KEY('quiz_logos'));
+    gameState.currentTurn = null;
+    gameState.answeredBy = {};
+    gameState.goldenPhaseStarted = false;
 
     confetti.stop();
 
     const winnerModal = document.getElementById('winner-modal');
     if (winnerModal) winnerModal.classList.remove('active');
+
+    // Reload golden questions from storage (they were consumed during the game)
+    const savedGolden = localStorage.getItem(KEY('quiz_golden'));
+    if (savedGolden) {
+        const parsed = JSON.parse(savedGolden);
+        goldenQuestions = Array.isArray(parsed) ? parsed.slice(0, 4) : [];
+    } else {
+        goldenQuestions = [];
+    }
+    for (let i = goldenQuestions.length + 1; i <= 4; i++) {
+        goldenQuestions.push({ id: `g${i}`, question: `سؤال ذهبي ${i}` });
+    }
+
+    // Reset spin wheel title
+    const spinModal = document.getElementById('spin-wheel-modal');
+    if (spinModal) {
+        const h2 = spinModal.querySelector('h2');
+        if (h2) h2.innerHTML = '<i class="fas fa-dharmachakra"></i> القرعة';
+    }
 
     renderGrid();
     updateScoreboard();

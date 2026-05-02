@@ -2040,3 +2040,236 @@ body::before {
     .golden-grid { grid-template-columns: repeat(2, 1fr); }
     .password-gate-box { padding: 30px 20px; }
 }
+
+/* ===== Answered cell colors ===== */
+.number-cell.answered-team1,
+.number-cell.answered-team1:nth-child(5n+1),
+.number-cell.answered-team1:nth-child(5n+2),
+.number-cell.answered-team1:nth-child(5n+3),
+.number-cell.answered-team1:nth-child(5n+4),
+.number-cell.answered-team1:nth-child(5n+5) {
+    background: linear-gradient(145deg, #C8960C, #A67A08);
+    box-shadow: 0 6px 20px rgba(200,150,12,0.45);
+    opacity: 0.75;
+    cursor: default;
+    pointer-events: none;
+}
+
+.number-cell.answered-team2,
+.number-cell.answered-team2:nth-child(5n+1),
+.number-cell.answered-team2:nth-child(5n+2),
+.number-cell.answered-team2:nth-child(5n+3),
+.number-cell.answered-team2:nth-child(5n+4),
+.number-cell.answered-team2:nth-child(5n+5) {
+    background: linear-gradient(145deg, #009B8D, #007A6E);
+    box-shadow: 0 6px 20px rgba(0,155,141,0.45);
+    opacity: 0.75;
+    cursor: default;
+    pointer-events: none;
+}
+
+/* ===== Current turn indicator ===== */
+.team.current-turn {
+    border: 3px solid var(--gold);
+    box-shadow: 0 0 18px rgba(200,150,12,0.55), 0 0 36px rgba(200,150,12,0.25);
+    transform: translateY(-3px) scale(1.02);
+    transition: all 0.4s ease;
+}
+
+.team-1.current-turn {
+    border-color: var(--team1-color);
+    box-shadow: 0 0 18px rgba(200,150,12,0.6), 0 0 36px rgba(200,150,12,0.3);
+}
+
+.team-2.current-turn {
+    border-color: var(--team2-color);
+    box-shadow: 0 0 18px rgba(0,155,141,0.6), 0 0 36px rgba(0,155,141,0.3);
+}
+
+/* ===== Golden timer bar ===== */
+.golden-timer-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding: 10px 16px;
+    background: rgba(0,0,0,0.15);
+    border-radius: 12px;
+}
+
+.golden-timer-bar-wrap {
+    flex: 1;
+    height: 10px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.golden-timer-bar {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, var(--gold-light), var(--gold));
+    border-radius: 8px;
+    transition: width 0.9s linear, background 0.5s;
+}
+
+.golden-timer-bar.warning {
+    background: linear-gradient(90deg, #ff9800, #f57c00);
+}
+
+.golden-timer-bar.danger {
+    background: linear-gradient(90deg, #f44336, #c62828);
+    animation: timerPulse 0.5s infinite alternate;
+}
+
+.golden-timer-num {
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: var(--gold);
+    min-width: 32px;
+    text-align: center;
+    font-family: 'Cairo', sans-serif;
+}
+
+.golden-timer-num.warning { color: #ff9800; }
+.golden-timer-num.danger  { color: #f44336; animation: timerPulse 0.5s infinite alternate; }
+
+/* ===========================
+   TWO-COLUMN GAME LAYOUT
+   numbers on left, scores on right
+   =========================== */
+
+.game-layout {
+    display: flex;
+    flex-direction: row;   /* RTL: first child = RIGHT, second child = LEFT */
+    align-items: flex-start;
+    gap: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 16px 24px 48px;
+    position: relative;
+    z-index: 10;
+}
+
+/* Numbers section takes all remaining space (LEFT side) */
+.game-layout .numbers-section {
+    flex: 1;
+    min-width: 0;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+}
+
+/* Larger cells since we have more room */
+.game-layout .numbers-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+.game-layout .number-cell {
+    font-size: 2.6rem;
+    border-radius: 22px;
+}
+
+.game-layout .number-cell.golden-cell {
+    font-size: 1.8rem;
+}
+
+/* Sidebar (RIGHT side in RTL) */
+.game-sidebar {
+    width: 290px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    position: sticky;
+    top: 20px;
+}
+
+/* Scoreboard vertical inside sidebar */
+.game-sidebar .scoreboard {
+    flex-direction: column;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    max-width: none;
+}
+
+.game-sidebar .team {
+    max-width: none;
+    width: 100%;
+    padding: 16px 12px;
+}
+
+.game-sidebar .team-logo-wrapper {
+    width: 90px;
+    height: 90px;
+}
+
+.game-sidebar .team-name {
+    font-size: 1rem;
+    margin-bottom: 6px;
+}
+
+.game-sidebar .team-score {
+    font-size: 2.6rem;
+}
+
+.game-sidebar .vs-badge {
+    align-self: center;
+    width: 44px;
+    height: 44px;
+    font-size: 0.85rem;
+}
+
+/* Turn indicator full width in sidebar */
+.game-sidebar .turn-indicator {
+    margin: 0;
+    width: 100%;
+    justify-content: center;
+    font-size: 1rem;
+    padding: 10px 16px;
+}
+
+/* Spin wheel button full width in sidebar */
+.game-sidebar .spin-wheel-center-row {
+    margin: 0;
+    text-align: center;
+}
+
+.game-sidebar .btn-spin-wheel {
+    width: 100%;
+    justify-content: center;
+    margin: 0;
+}
+
+/* ===== Responsive: stack on small screens ===== */
+@media (max-width: 900px) {
+    .game-layout {
+        flex-direction: column;
+        padding: 12px 16px 40px;
+    }
+
+    .game-sidebar {
+        width: 100%;
+        position: static;
+    }
+
+    .game-sidebar .scoreboard {
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .game-sidebar .team {
+        max-width: 260px;
+    }
+
+    .game-layout .numbers-grid {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 12px;
+    }
+
+    .game-layout .number-cell {
+        font-size: 2rem;
+    }
+}

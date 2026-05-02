@@ -41,6 +41,9 @@ function initAdmin() {
     loadQuestions();
     renderQuestionsList();
     loadGoldenQuestions();
+    loadGoldenQuestionsB();
+    loadQuestionsB();
+    renderQuestionsListB();
     updateCorrectLabels();
     setupDragDrop();
 }
@@ -517,3 +520,165 @@ function updateCorrectLabels() {
 document.querySelectorAll('input[name="correct-answer"]').forEach(radio => {
     radio.addEventListener('change', updateCorrectLabels);
 });
+
+// ====== Golden Questions Group B ======
+function loadGoldenQuestionsB() {
+    const saved = localStorage.getItem('quiz_golden_b');
+    if (!saved) return;
+
+    const list = JSON.parse(saved);
+    list.forEach(q => {
+        const num = q.id.replace('g', '');
+        const ta = document.getElementById(`golden-b-q-${num}`);
+        if (ta) ta.value = q.question || '';
+    });
+}
+
+function saveGoldenQuestionsB() {
+    const goldenList = [];
+    for (let i = 1; i <= 4; i++) {
+        const ta   = document.getElementById(`golden-b-q-${i}`);
+        const text = ta ? ta.value.trim() : '';
+        if (text) goldenList.push({ id: `g${i}`, question: text });
+    }
+
+    localStorage.setItem('quiz_golden_b', JSON.stringify(goldenList));
+    showAlert('success', goldenList.length > 0
+        ? `تم حفظ ${goldenList.length} سؤال ذهبي للمجموعة ب بنجاح`
+        : 'تم مسح الأسئلة الذهبية للمجموعة ب');
+}
+
+// ====== Questions Group B ======
+let questionsB = [];
+
+function loadQuestionsB() {
+    const saved = localStorage.getItem('quiz_questions_b');
+    if (saved) {
+        questionsB = JSON.parse(saved);
+    } else {
+        questionsB = [...defaultQuestions];
+        localStorage.setItem('quiz_questions_b', JSON.stringify(questionsB));
+    }
+}
+
+function saveQuestionsB() {
+    localStorage.setItem('quiz_questions_b', JSON.stringify(questionsB));
+}
+
+function addQuestionB() {
+    const numberEl   = document.getElementById('qb-number');
+    const textEl     = document.getElementById('qb-text');
+    const checkedRadio = document.querySelector('input[name="correct-answer-b"]:checked');
+
+    const number  = parseInt(numberEl ? numberEl.value : '');
+    const text    = (textEl ? textEl.value : '').trim();
+    const answers = [0, 1, 2, 3].map(i => {
+        const el = document.getElementById(`qb-answer-${i}`);
+        return el ? el.value.trim() : '';
+    });
+    const correct = checkedRadio ? parseInt(checkedRadio.value) : 0;
+
+    if (!number || number < 1) { showAlert('error', 'يرجى إدخال رقم صحيح للسؤال'); return; }
+    if (!text)                  { showAlert('error', 'يرجى إدخال نص السؤال'); return; }
+    if (answers.some(a => !a)) { showAlert('error', 'يرجى إدخال جميع الخيارات'); return; }
+
+    const questionObj = { id: number, question: text, answers, correct };
+    const existingIdx = questionsB.findIndex(q => q.id === number);
+
+    if (existingIdx !== -1) {
+        questionsB[existingIdx] = questionObj;
+        showAlert('success', `تم تحديث السؤال رقم ${number} في المجموعة ب`);
+    } else {
+        questionsB.push(questionObj);
+        questionsB.sort((a, b) => a.id - b.id);
+        showAlert('success', `تم إضافة السؤال رقم ${number} للمجموعة ب`);
+    }
+
+    saveQuestionsB();
+    renderQuestionsListB();
+
+    if (numberEl) numberEl.value = '';
+    if (textEl)   textEl.value = '';
+    [0, 1, 2, 3].forEach(i => {
+        const el = document.getElementById(`qb-answer-${i}`);
+        if (el) el.value = '';
+    });
+}
+
+function deleteQuestionB(id) {
+    if (!confirm(`هل تريد حذف السؤال رقم ${id} من المجموعة ب؟`)) return;
+    questionsB = questionsB.filter(q => q.id !== id);
+    saveQuestionsB();
+    renderQuestionsListB();
+    showAlert('success', `تم حذف السؤال رقم ${id} من المجموعة ب`);
+}
+
+function editQuestionB(id) {
+    const q = questionsB.find(q => q.id === id);
+    if (!q) return;
+
+    const numberEl = document.getElementById('qb-number');
+    const textEl   = document.getElementById('qb-text');
+    if (numberEl) numberEl.value = q.id;
+    if (textEl)   textEl.value  = q.question;
+    [0, 1, 2, 3].forEach(i => {
+        const el = document.getElementById(`qb-answer-${i}`);
+        if (el) el.value = q.answers[i] || '';
+    });
+
+    document.querySelectorAll('input[name="correct-answer-b"]').forEach(radio => {
+        radio.checked = parseInt(radio.value) === q.correct;
+    });
+    updateCorrectLabelsB();
+
+    const card = document.getElementById('add-question-b-card');
+    if (card) card.scrollIntoView({ behavior: 'smooth' });
+
+    showAlert('success', `جاري تعديل السؤال رقم ${id} في المجموعة ب`);
+}
+
+function renderQuestionsListB() {
+    const list  = document.getElementById('questions-b-list');
+    const count = document.getElementById('questions-b-count');
+    if (!list) return;
+
+    if (count) count.textContent = questionsB.length;
+
+    if (questionsB.length === 0) {
+        list.innerHTML = '<li style="text-align:center; padding:30px; color:#999; font-weight:600;">لا توجد أسئلة للمجموعة ب حالياً</li>';
+        return;
+    }
+
+    const letters = ['أ', 'ب', 'ج', 'د'];
+
+    list.innerHTML = questionsB.map(q => `
+        <li class="question-item">
+            <div class="q-number">${q.id}</div>
+            <div class="q-text">
+                <div style="font-weight:800; margin-bottom:4px;">${q.question}</div>
+                <div style="font-size:0.85rem; color:#666;">
+                    ${q.answers.map((a, i) => `
+                        <span style="margin-inline-start:10px; ${i === q.correct ? 'color:var(--correct); font-weight:800;' : ''}">
+                            ${letters[i]}) ${a} ${i === q.correct ? '✓' : ''}
+                        </span>`).join('')}
+                </div>
+            </div>
+            <div class="q-actions">
+                <button class="btn btn-primary btn-sm" onclick="editQuestionB(${q.id})" title="تعديل">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="deleteQuestionB(${q.id})" title="حذف">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </li>
+    `).join('');
+}
+
+function updateCorrectLabelsB() {
+    document.querySelectorAll('#add-question-b-card .answer-option-item').forEach(item => {
+        const radio = item.querySelector('input[type="radio"]');
+        const label = item.querySelector('.correct-label');
+        if (label) label.style.visibility = radio && radio.checked ? 'visible' : 'hidden';
+    });
+}

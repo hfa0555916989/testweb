@@ -212,7 +212,7 @@
 
         <!-- ===== الأسئلة الذهبية ===== -->
         <div class="admin-card">
-            <h2><i class="fas fa-star" style="color:var(--gold,#d4af37);"></i> الأسئلة الذهبية <small style="font-size:0.75rem; color:#aaa;">(حد أقصى 4 أسئلة)</small></h2>
+            <h2><i class="fas fa-star" style="color:var(--gold,#d4af37);"></i> الأسئلة الذهبية للمجموعة أ <small style="font-size:0.75rem; color:#aaa;">(حد أقصى 4 أسئلة)</small></h2>
             <p style="color:#aaa; font-size:0.9rem; margin-bottom:18px;">أسئلة مفتوحة يحكم عليها المشرف — اتركها فارغة لاستبعادها</p>
 
             <div class="form-group">
@@ -233,7 +233,34 @@
             </div>
 
             <button class="btn btn-gold" onclick="saveGoldenQuestions()">
-                <i class="fas fa-save"></i> حفظ الأسئلة الذهبية
+                <i class="fas fa-save"></i> حفظ الأسئلة الذهبية للمجموعة أ
+            </button>
+        </div>
+
+        <!-- ===== الأسئلة الذهبية للمجموعة ب ===== -->
+        <div class="admin-card">
+            <h2><i class="fas fa-star" style="color:var(--gold,#d4af37);"></i> الأسئلة الذهبية للمجموعة ب <small style="font-size:0.75rem; color:#aaa;">(حد أقصى 4 أسئلة)</small></h2>
+            <p style="color:#aaa; font-size:0.9rem; margin-bottom:18px;">أسئلة مفتوحة يحكم عليها المشرف — اتركها فارغة لاستبعادها</p>
+
+            <div class="form-group">
+                <label><i class="fas fa-star" style="color:#d4af37;"></i> السؤال الذهبي 1</label>
+                <textarea id="golden-b-q-1" placeholder="اكتب نص السؤال الذهبي الأول للمجموعة ب..." rows="2"></textarea>
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-star" style="color:#d4af37;"></i> السؤال الذهبي 2</label>
+                <textarea id="golden-b-q-2" placeholder="اكتب نص السؤال الذهبي الثاني للمجموعة ب..." rows="2"></textarea>
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-star" style="color:#d4af37;"></i> السؤال الذهبي 3</label>
+                <textarea id="golden-b-q-3" placeholder="اكتب نص السؤال الذهبي الثالث للمجموعة ب..." rows="2"></textarea>
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-star" style="color:#d4af37;"></i> السؤال الذهبي 4</label>
+                <textarea id="golden-b-q-4" placeholder="اكتب نص السؤال الذهبي الرابع للمجموعة ب..." rows="2"></textarea>
+            </div>
+
+            <button class="btn btn-gold" onclick="saveGoldenQuestionsB()">
+                <i class="fas fa-save"></i> حفظ الأسئلة الذهبية للمجموعة ب
             </button>
         </div>
 
@@ -254,7 +281,7 @@
 
         <!-- ===== إضافة سؤال جديد ===== -->
         <div class="admin-card" id="add-question-card">
-            <h2><i class="fas fa-plus-circle"></i> إضافة سؤال جديد</h2>
+            <h2><i class="fas fa-plus-circle"></i> إضافة سؤال جديد للمجموعة أ</h2>
             <div class="form-group">
                 <label>رقم السؤال</label>
                 <input type="number" id="q-number" min="1" placeholder="رقم السؤال">
@@ -292,9 +319,58 @@
 
         <!-- ===== قائمة الأسئلة ===== -->
         <div class="admin-card">
-            <h2><i class="fas fa-list-ol"></i> قائمة الأسئلة (<span id="questions-count">0</span>)</h2>
+            <h2><i class="fas fa-list-ol"></i> قائمة أسئلة المجموعة أ (<span id="questions-count">0</span>)</h2>
             <ul class="question-list" id="questions-list">
                 <!-- Questions will be rendered here -->
+            </ul>
+        </div>
+
+        <!-- ===== إضافة سؤال جديد للمجموعة ب ===== -->
+        <div class="admin-card" id="add-question-b-card">
+            <h2><i class="fas fa-plus-circle" style="color:var(--gold);"></i> إضافة سؤال جديد للمجموعة ب</h2>
+            <div class="form-group">
+                <label>رقم السؤال</label>
+                <input type="number" id="qb-number" min="1" placeholder="رقم السؤال">
+            </div>
+            <div class="form-group">
+                <label>نص السؤال</label>
+                <textarea id="qb-text" placeholder="اكتب نص السؤال هنا..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>الخيارات (حدد الإجابة الصحيحة)</label>
+                <div class="answer-options-group">
+                    <div class="answer-option-item">
+                        <input type="radio" name="correct-answer-b" value="0" checked onchange="updateCorrectLabelsB()">
+                        <input type="text" id="qb-answer-0" placeholder="الخيار أ">
+                        <span class="correct-label">✓</span>
+                    </div>
+                    <div class="answer-option-item">
+                        <input type="radio" name="correct-answer-b" value="1" onchange="updateCorrectLabelsB()">
+                        <input type="text" id="qb-answer-1" placeholder="الخيار ب">
+                        <span class="correct-label" style="visibility:hidden;">✓</span>
+                    </div>
+                    <div class="answer-option-item">
+                        <input type="radio" name="correct-answer-b" value="2" onchange="updateCorrectLabelsB()">
+                        <input type="text" id="qb-answer-2" placeholder="الخيار ج">
+                        <span class="correct-label" style="visibility:hidden;">✓</span>
+                    </div>
+                    <div class="answer-option-item">
+                        <input type="radio" name="correct-answer-b" value="3" onchange="updateCorrectLabelsB()">
+                        <input type="text" id="qb-answer-3" placeholder="الخيار د">
+                        <span class="correct-label" style="visibility:hidden;">✓</span>
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-gold" onclick="addQuestionB()">
+                <i class="fas fa-plus"></i> إضافة السؤال للمجموعة ب
+            </button>
+        </div>
+
+        <!-- ===== قائمة أسئلة المجموعة ب ===== -->
+        <div class="admin-card">
+            <h2><i class="fas fa-list-ol" style="color:var(--gold);"></i> قائمة أسئلة المجموعة ب (<span id="questions-b-count">0</span>)</h2>
+            <ul class="question-list" id="questions-b-list">
+                <!-- Group B questions rendered here -->
             </ul>
         </div>
 
